@@ -1,0 +1,103 @@
+---
+title: "Spatial Demo"
+author: "Caitlin Mothes"
+date: "`r Sys.Date()`"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(sf)
+library(terra)
+library(tmap)
+library(tigris)
+library(tidyverse)
+```
+
+Read in Colorado counties
+```{r}
+counties <- counties(state = "CO")
+```
+
+Inspect the Counties object
+
+```{r}
+counties
+```
+
+Visualize counties
+
+```{r}
+#tmap_mode("view")
+```
+
+
+```{r}
+qtm(counties)
+```
+
+Treat sf objects like data frames
+
+Filter out Larimer county
+
+```{r}
+larimer <- counties %>% 
+  filter(NAME == "Larimer") %>% 
+  #convert area units
+  mutate(AWATER_km = AWATER/1000)
+
+
+qtm(larimer)
+```
+
+
+Working with coordinates
+
+```{r}
+library(lterdatasampler)
+data("nwt_pikas")
+```
+
+Make this spatial
+
+```{r}
+pikas_sf <- st_as_sf(nwt_pikas, coords = c("utm_easting", "utm_northing"), crs = 26913)
+```
+
+```{r}
+qtm(pikas_sf)
+```
+
+ Raster data
+ 
+```{r}
+elevation <- rast("data/elevation.tif")
+```
+
+```{r}
+qtm(elevation)
+```
+
+
+```{r}
+tm_shape(elevation)+
+  tm_raster(style = "cont")
+```
+
+Extract elevation at pika occurrences
+
+```{r}
+pikas_prj$elevation_raster <- terra::extract(elevation, pikas_prj)[,2]
+```
+
+```{r}
+crs(elevation) == crs(pikas_sf)
+
+
+pikas_prj <- st_transform(pikas_sf, crs = st_crs(elevation))
+```
+

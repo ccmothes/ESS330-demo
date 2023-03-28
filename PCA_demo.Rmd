@@ -1,0 +1,101 @@
+---
+title: "PCA Demo"
+author: "Caitlin Mothes"
+date: "`r Sys.Date()`"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Set up by loading libraries and data sets
+
+```{r eval=FALSE}
+install.packages("plotly")
+```
+
+
+```{r}
+library(tidyverse)
+library(lterdatasampler)
+library(plotly)
+library(ggfortify)
+
+
+# load crab data
+data("pie_crab")
+
+```
+
+inspect the data
+
+```{r}
+pie_crab
+```
+
+
+Look at variable correlations
+```{r}
+pie_crab %>% 
+  select(latitude, air_temp:water_temp_sd) %>% 
+  cor()
+```
+
+
+Conduct the PCA test
+
+```{r}
+crab_pca <- pie_crab %>% 
+  select(latitude, air_temp:water_temp_sd) %>%
+  prcomp()
+```
+
+
+Look at variance contributions
+```{r}
+summary(crab_pca)
+```
+
+Look at variable loadings
+```{r}
+crab_pca$rotation
+```
+
+Look at site/observation scores
+```{r}
+cor(crab_pca$x)
+```
+
+Make screeplot of variable contributions
+```{r}
+screeplot(crab_pca)
+```
+
+Make a biplot
+```{r}
+biplot(crab_pca)
+```
+
+Make a ggplot biplot (and make it interactive)
+```{r eval=FALSE}
+ggplotly(autoplot(crab_pca, loadings = TRUE, loadings.label = TRUE) +
+  theme_minimal()) 
+```
+
+
+Add PC axes to pie_crab data
+
+```{r}
+pie_crab <- bind_cols(pie_crab, crab_pca$x)
+```
+
+Conduct the multiple linear regression
+```{r}
+model <- lm(size ~ PC1 + PC2 + PC3 + PC4 + PC5, data = pie_crab)
+```
+
+```{r}
+summary(model)
+```
+
