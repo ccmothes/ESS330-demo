@@ -1,0 +1,73 @@
+---
+title: "Code Review Assignment"
+author: 
+date: "`r Sys.Date()`"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+```
+
+## The Assignment:
+
+*Tip: View this in the visual editor in RStudio*
+
+You want to re-create the Word document in the Week 11 module on Canvas titled `code_review_output.docx`. Below is the workflow to do so, ***however*** you will notice if you attempt to render this R Markdown document as is it does NOT reproduce the `code_review_output.docx` file, and won't even render until you fix some of the mistakes/missing elements. Therefore, this workflow is not reproducible! Your task is to fix the below coding workflow so that it renders and exactly matches the Word output of `code_review_output.docx` (*including* whether or not certain code chunks and/or outputs are shown).
+
+There are a total of **5 fixes** you need to make to the workflow below. To complete this assignment you must ***1)*** Identify the 5 errors and specify what they are (*4 pts each*) and ***2)*** fix the errors and render this entire .Rmd as a Word doc where the content below matches that of the `code_review_output.docx` (*5 pts*).
+
+**List here the 5 errors you had to fix in this workflow:**
+
+1.  Need to read in the necessary libraries at the beginning of the workflow (`tidyverse` and `palmerpenguins`).
+2.  The `geom_point()` scatter plot must be colored by species by adding `color = species` within `aes()`
+3.  Must assign the Adelie filtered data set to a new variable called `adelie`
+4.  'Adelie' is spelled wrong in the `filter()` operation
+5.  The code chunks must be hidden from the output by setting `echo = FALSE` in the R setup chunk at the top (or individually in each code chunk).
+
+## The workflow you need to fix begins here:
+
+In this workflow, we want to explore the Palmer Penguins data set collected at the Palmer Station LTER in Antarctica.
+
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+```
+
+We read in the data and initially explore its structure:
+
+```{r}
+data("penguins")
+summary(penguins)
+```
+
+Lets first explore body mass among all the penguin species with a histogram:
+
+```{r warning=FALSE}
+penguins %>% 
+  ggplot()+
+  geom_histogram(aes(x = body_mass_g))
+```
+
+Now we want to visualize the relationship between body mass and bill length *among species*:
+
+```{r warning=FALSE}
+penguins %>%
+  ggplot() +
+  geom_point(aes(x = body_mass_g, y = bill_length_mm, color = species))
+```
+
+Finally, lets create a new data frame called `adelie` that contains data for just the *Adelie* penguin species, and then visualize the differences in that species' body mass among islands.
+
+```{r}
+adelie <- penguins %>% 
+  filter(species == 'Adelie')
+```
+
+```{r warning=FALSE}
+adelie %>% 
+  ggplot() +
+  geom_boxplot(aes(x = island, y = body_mass_g))
+```
+
+This figure suggests *Adelie* individuals on the Dream island are slightly smaller that those on the Biscoe and Torgersen islands.
